@@ -1,0 +1,120 @@
+name: fpcupdeluxe
+title: FPCUPdeluxe
+version: '2.2.0g'
+summary: A GUI installer for FPC and Lazarus.
+description: |
+  Fpcup, fpclazup and fpcupdeluxe are basically wrappers around svn/make on steroids. They try to use the FPC/Lazarus build process as much as possible.
+  
+  Fcpupdeluxe is the latest addition that adds a GUI to ease its use.
+confinement: strict
+base: core20
+grade: stable
+icon: "Install/snap/local/fpcupdeluxe.png"
+license: LGPL-2.0
+
+parts:
+  lazarus:
+    plugin: nil
+    source: .
+    source-type: local
+    build-packages: 
+    - wget
+    - libgtk2.0-dev
+    override-build: |
+      wget -nc https://deac-ams.dl.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.12/lazarus-project_2.0.12-0_amd64.deb
+      wget -nc https://netix.dl.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.12/fpc-laz_3.2.0-1_amd64.deb
+      wget -nc https://netix.dl.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.0.12/fpc-src_3.2.0-1_amd64.deb
+      apt install ./lazarus-project_2.0.12-0_amd64.deb ./fpc-laz_3.2.0-1_amd64.deb ./fpc-src_3.2.0-1_amd64.deb
+    prime: [-*]
+  fpcupdeluxe:
+    after: [lazarus]
+    plugin: nil
+    source: .
+    source-type: local
+    override-build: |
+      snapcraftctl build
+      lazbuild  fpcupdeluxe.lpi
+      install -d -m 755 $SNAPCRAFT_PART_INSTALL/usr/share/fpcupdeluxe/languages
+      install -m 644 languages/fpcupdeluxe.en.po $SNAPCRAFT_PART_INSTALL/usr/share/fpcupdeluxe/languages
+      install -m 644 languages/fpcupdeluxe.ko.po $SNAPCRAFT_PART_INSTALL/usr/share/fpcupdeluxe/languages
+      install -m 644 languages/fpcupdeluxe.zh.po $SNAPCRAFT_PART_INSTALL/usr/share/fpcupdeluxe/languages
+      install -d -m 755 $SNAPCRAFT_PART_INSTALL/usr/share/fpcupdeluxe
+      install -s -m 755 deluxebin/fpcupdeluxe-x86_64-linux $SNAPCRAFT_PART_INSTALL/usr/share/fpcupdeluxe/fpcupdeluxe
+      install -m 644 deluxebin/settings.ini $SNAPCRAFT_PART_INSTALL/usr/share/fpcupdeluxe
+      install -m 644 deluxebin/fpcup.ini $SNAPCRAFT_PART_INSTALL/usr/share/fpcupdeluxe
+      install -m 644 deluxebin/fpcupdeluxe.ini $SNAPCRAFT_PART_INSTALL/usr/share/fpcupdeluxe
+      install -d -m 755 $SNAPCRAFT_PART_INSTALL/usr/bin
+      install -m 755 Install/snap/local/fpcupdeluxe $SNAPCRAFT_PART_INSTALL/usr/bin
+      install -d -m 755 $SNAPCRAFT_PART_INSTALL/usr/share/applications
+      install -m 755 Install/snap/local/fpcupdeluxe.desktop $SNAPCRAFT_PART_INSTALL/usr/share/applications
+      install -d -m 755 $SNAPCRAFT_PART_INSTALL/usr/share/pixmaps
+      install -m 644 Install/snap/local/fpcupdeluxe.png $SNAPCRAFT_PART_INSTALL/usr/share/pixmaps
+    stage:
+      - etc
+      - usr
+      - usr/bin
+      - usr/share/fpcupdeluxe
+      - usr/share/applications/fpcupdeluxe.desktop
+      - usr/share/pixmaps
+    stage-packages:
+      - libatk1.0-0
+      - libcairo2
+      - libdatrie1
+      - libfontconfig1
+      - libfreetype6
+      - libfribidi0
+      - libgdk-pixbuf2.0-0
+      - libgraphite2-3
+      - libgtk2.0-0
+      - libharfbuzz0b
+      - libpango-1.0-0
+      - libpangocairo-1.0-0
+      - libpangoft2-1.0-0
+      - libpixman-1-0
+      - libpng16-16
+      - libthai0
+      - libx11-6
+      - libxau6
+      - libxcb-render0
+      - libxcb-shm0
+      - libxcb1
+      - libxcomposite1
+      - libxcursor1
+      - libxdamage1
+      - libxdmcp6
+      - libxext6
+      - libxfixes3
+      - libxi6
+      - libxinerama1
+      - libxrandr2
+      - libxrender1
+      # Additional deps
+      - libx11-dev
+      - libgtk2.0-dev
+      - libcairo2-dev
+      - libpango1.0-dev
+      - libxtst-dev
+      - libgdk-pixbuf2.0-dev
+      - libatk1.0-dev
+      - libghc-x11-dev
+      - make
+      - build-essential
+      - binutils
+      - git
+      - gdb
+      - zip
+      - unzip
+      - subversion
+
+apps:
+  fpcupdeluxe:
+    command: usr/share/fpcupdeluxe/fpcupdeluxe
+    desktop: usr/share/applications/fpcupdeluxe.desktop    
+    plugs:
+      - desktop
+      - x11
+      - home
+
+layout:
+  /usr/share/fpcupdeluxe:
+    bind: $SNAP/usr/share/fpcupdeluxe

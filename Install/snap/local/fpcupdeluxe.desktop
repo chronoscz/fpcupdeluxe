@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=FPCUPdeluxe
+Comment=A GUI installer for FPC and Lazarus.
+Exec=fpcupdeluxe
+Icon=fpcupdeluxe
+Terminal=false
+Type=Application
+Categories=GNOME;Application;Development;
+StartupNotify=true
